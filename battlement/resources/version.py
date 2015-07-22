@@ -2,6 +2,7 @@ import falcon
 
 from battlement.resources.common import APIResource
 
+
 class VersionResource(APIResource):
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_200
