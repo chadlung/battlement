@@ -2,6 +2,7 @@ import falcon
 
 from battlement.resources import common
 
+
 class VersionResource(common.APIResource):
     def on_get(self, req, resp):
         resp.status = falcon.HTTP_200
@@ -9,4 +10,3 @@ class VersionResource(common.APIResource):
             'API Version': '1',
             'Service Version': '0.0.1'
         })
-

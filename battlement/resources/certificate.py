@@ -1,5 +1,3 @@
-import falcon
-
 from battlement.resources import common
 
 
@@ -20,11 +18,11 @@ general_certificate_creation = {
         }
     }
 }
+
+
 class CertificatesResource(common.APIResource):
     @common.validate(general_certificate_creation)
     def on_post(self, req, resp):
-        #json schema validation here
         resp.body = self.format_response_body({
             'certificate_ref': 'https://localhost/v1/certificates/7bd5a553-7258-44bb-b195-457c2bdcff40'
         })
-        
