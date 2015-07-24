@@ -1,21 +1,17 @@
-import uuid
-from datetime import datetime
-
 import sqlalchemy as sa
 
 from battlement.db import models
 
 
-class CertificateModel(models.ModelBase):
+class CertificateModel(models.ModelBase, models.SAModel):
     __tablename__ = 'certificates'
-    id = sa.Column(sa.String(36), primary_key=True, default=uuid.uuid4)
     provisioner = sa.Column(sa.String(255), nullable=False)
     provision_type = sa.Column(sa.String(255), nullable=False)
-    provision_data = sa.Column(sa.Text, nullable=False)
-    created_at = sa.Column(sa.DateTime, default=datetime.utcnow)
-    updated_at = sa.Column(
-        sa.DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow
-    )
+    provision_data = sa.Column(models.JsonBlob(), nullable=False)
 
+    def __init__(self, id=None, created_at=None, updated_at=None,
+                 provisioner=None, provision_type=None, provision_data=None):
+        super(CertificateModel, self).__init__(id, created_at, updated_at)
+        self.provisioner = provisioner
+        self.provision_type = provision_type
+        self.provision_data = provision_data

@@ -1,13 +1,13 @@
 from battlement import db
-from battlement.db import models
+from battlement.db.models import certificates
 from battlement.resources import common
 
 
 general_certificate_creation = {
     'type': 'object',
-    'required': ['provisoner', 'provision_type', 'provision_data'],
+    'required': ['provisioner', 'provision_type', 'provision_data'],
     'properties': {
-        'provisoner': {'type': 'string'},
+        'provisioner': {'type': 'string'},
         'provision_type': {'type': 'string'},
         'provision_data': {
             'type': ['string', 'object'],
@@ -24,7 +24,10 @@ general_certificate_creation = {
 
 class CertificatesResource(common.APIResource):
     @common.validate(general_certificate_creation)
-    def on_post(self, req, resp):
+    def on_post(self, req, resp, json_body):
+        model = certificates.CertificateModel.from_dict(json_body)
+        model.save(db.get_session())
+
         resp.body = self.format_response_body({
             'certificate_ref': 'https://localhost/v1/certificates/{uuid}'
         })
