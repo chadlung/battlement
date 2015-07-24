@@ -35,7 +35,7 @@ class ModelBase(object):
     )
 
     def __init__(self, id=None, created_at=None, updated_at=None):
-        self.id = id
+        self.id = id or utils.new_uuid()
         self.created_at = created_at
         self.updated_at = updated_at
 
