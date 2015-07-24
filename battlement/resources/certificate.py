@@ -28,6 +28,5 @@ class CertificatesResource(common.APIResource):
         model = certificates.CertificateModel.from_dict(json_body)
         model.save(db.get_session())
 
-        resp.body = self.format_response_body({
-            'certificate_ref': 'https://localhost/v1/certificates/{uuid}'
-        })
+        ref = 'https://localhost/v1/certificates/{uuid}'.format(uuid=model.id)
+        resp.body = self.format_response_body({'certificate_ref': ref})
