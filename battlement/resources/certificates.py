@@ -1,6 +1,6 @@
 import falcon
 
-from battlement import db
+from battlement.db import manager
 from battlement.db.models import certificates
 from battlement.resources import common
 
@@ -28,7 +28,7 @@ class CertificatesResource(common.APIResource):
     @common.load_and_validate(general_certificate_creation)
     def on_post(self, req, resp, json_body):
         model = certificates.CertificateModel.from_dict(json_body)
-        model.save(db.get_session())
+        model.save(manager.session)
 
         ref = common.get_full_url('/v1/certificates/{}'.format(model.id))
         resp.body = self.format_response_body({'certificate_ref': ref})
@@ -36,7 +36,7 @@ class CertificatesResource(common.APIResource):
 
 class CertificateResource(common.APIResource):
     def on_get(self, req, resp, uuid):
-        model = certificates.CertificateModel.get(uuid, db.get_session())
+        model = certificates.CertificateModel.get(uuid, manager.session)
 
         if model:
             body_dict = model.to_dict()
@@ -45,9 +45,9 @@ class CertificateResource(common.APIResource):
             resp.status = falcon.HTTP_404
 
     def on_delete(self, req, resp, uuid):
-        model = certificates.CertificateModel.get(uuid, db.get_session())
+        model = certificates.CertificateModel.get(uuid, manager.session)
         if model:
-            model.delete(db.get_session())
+            model.delete(manager.session)
             resp.status = falcon.HTTP_204
         else:
             resp.status = falcon.HTTP_404

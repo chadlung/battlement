@@ -1,4 +1,3 @@
-import os
 import urlparse
 import sqlalchemy
 from sqlalchemy import orm
@@ -7,19 +6,27 @@ from sqlalchemy.orm import scoping
 from battlement.config import cfg
 from battlement.db import models
 
-db_connection = cfg.get('db', 'connection')
-db_engine = sqlalchemy.create_engine(db_connection)
 
-DBSession = scoping.scoped_session(
-    orm.sessionmaker(bind=db_engine, autocommit=True)
-)
+class DBManager(object):
+    def __init__(self, connection=None):
+        self.connection = connection or cfg.get('db', 'connection')
+
+        self.engine = sqlalchemy.create_engine(self.connection)
+        self.DBSession = scoping.scoped_session(
+            orm.sessionmaker(
+                bind=self.engine,
+                autocommit=True
+            )
+        )
+
+    @property
+    def session(self):
+        return self.DBSession()
+
+    def setup(self):
+        parsed_url = urlparse.urlparse(self.connection)
+        if parsed_url.scheme == 'sqlite':
+            models.SAModel.metadata.create_all(self.engine)
 
 
-def get_session():
-    return DBSession()
-
-
-def setup_database():
-    parsed_url = urlparse.urlparse(db_connection)
-    if parsed_url.scheme == 'sqlite':
-        models.SAModel.metadata.create_all(db_engine)
+manager = DBManager()

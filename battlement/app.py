@@ -10,7 +10,7 @@ from battlement.resources.certificates import CertificatesResource
 class BattlementApp(falcon.API):
     def __init__(self):
         super(BattlementApp, self).__init__()
-        db.setup_database()
+        db.manager.setup()
 
         version = VersionResource()
         provisioners = ProvisionersResource()
