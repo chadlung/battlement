@@ -2,6 +2,8 @@ import json
 import jsonschema
 import falcon
 
+from battlement.config import cfg
+
 
 class APIResource(object):
     def format_response_body(self, body_dict):
@@ -40,3 +42,9 @@ def load_and_validate(schema):
             func(self, req, resp, json_body, *args, **kwargs)
         return wrapper
     return request_decorator
+
+
+def get_full_url(tail):
+    base = cfg.get('api', 'base_ref')
+    sep = '/' if not tail.startswith('/') else ''
+    return '{base}{sep}{tail}'.format(base=base, sep=sep, tail=tail)
