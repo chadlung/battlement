@@ -11,9 +11,13 @@ class BattlementApp(falcon.API):
         super(BattlementApp, self).__init__()
         db.setup_database()
 
-        self.add_route('/', VersionResource())
-        self.add_route('/v1/provisioners', ProvisionersResource())
-        self.add_route('/v1/certificates', CertificatesResource())
+        version = VersionResource()
+        provisioners = ProvisionersResource()
+        certificates = CertificatesResource()
+
+        self.add_route('/', version)
+        self.add_route('/v1/provisioners', provisioners)
+        self.add_route('/v1/certificates', certificates)
 
 
 application = BattlementApp()
