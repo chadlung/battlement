@@ -25,7 +25,7 @@ general_certificate_creation = {
 
 
 class CertificatesResource(common.APIResource):
-    @common.validate(general_certificate_creation)
+    @common.load_and_validate(general_certificate_creation)
     def on_post(self, req, resp, json_body):
         model = certificates.CertificateModel.from_dict(json_body)
         model.save(db.get_session())

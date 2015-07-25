@@ -32,7 +32,7 @@ class APIResource(object):
         return obj
 
 
-def validate(schema):
+def load_and_validate(schema):
     def request_decorator(func):
         def wrapper(self, req, resp, *args, **kwargs):
             json_body = self.load_body(req)
