@@ -15,3 +15,12 @@ class CertificateModel(models.ModelBase, models.SAModel):
         self.provisioner = provisioner
         self.provision_type = provision_type
         self.provision_data = provision_data
+
+    def to_dict(self):
+        body_dict = super(CertificateModel, self).to_dict()
+        body_dict.update({
+            'provisioner': self.provisioner,
+            'provision_type': self.provision_type,
+            'provision_data': self.provision_data
+        })
+        return body_dict

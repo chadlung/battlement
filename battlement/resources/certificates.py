@@ -1,3 +1,5 @@
+import falcon
+
 from battlement import db
 from battlement.db.models import certificates
 from battlement.resources import common
@@ -30,3 +32,22 @@ class CertificatesResource(common.APIResource):
 
         ref = 'https://localhost/v1/certificates/{uuid}'.format(uuid=model.id)
         resp.body = self.format_response_body({'certificate_ref': ref})
+
+
+class CertificateResource(common.APIResource):
+    def on_get(self, req, resp, uuid):
+        model = certificates.CertificateModel.get(uuid, db.get_session())
+
+        if model:
+            body_dict = model.to_dict()
+            resp.body = self.format_response_body(body_dict)
+        else:
+            resp.status = falcon.HTTP_404
+
+    def on_delete(self, req, resp, uuid):
+        model = certificates.CertificateModel.get(uuid, db.get_session())
+        if model:
+            model.delete(db.get_session())
+            resp.status = falcon.HTTP_204
+        else:
+            resp.status = falcon.HTTP_404
