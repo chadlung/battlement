@@ -27,6 +27,7 @@ class CertificatesResource(common.APIResource):
     @common.load_and_validate(general_certificate_creation)
     def on_post(self, req, resp, json_body):
         model = certificates.CertificateModel.from_dict(json_body)
+        model.project_id = req.context['project']
         model.save(self.db.session)
 
         ref = common.get_full_url('/v1/certificates/{}'.format(model.id))
@@ -35,7 +36,11 @@ class CertificatesResource(common.APIResource):
 
 class CertificateResource(common.APIResource):
     def on_get(self, req, resp, uuid):
-        model = certificates.CertificateModel.get(uuid, self.db.session)
+        model = certificates.CertificateModel.get(
+            uuid,
+            req.context['project'],
+            self.db.session
+        )
 
         if model:
             body_dict = model.to_dict()
@@ -44,9 +49,14 @@ class CertificateResource(common.APIResource):
             resp.status = falcon.HTTP_404
 
     def on_delete(self, req, resp, uuid):
-        model = certificates.CertificateModel.get(uuid, self.db.session)
+        project_id = req.context['project']
+        model = certificates.CertificateModel.get(
+            uuid,
+            project_id,
+            self.db.session
+        )
         if model:
-            model.delete(self.db.session)
+            model.delete(project_id, self.db.session)
             resp.status = falcon.HTTP_204
         else:
             resp.status = falcon.HTTP_404

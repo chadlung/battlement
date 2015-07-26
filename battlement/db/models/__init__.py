@@ -40,9 +40,9 @@ class ModelBase(object):
         self.updated_at = updated_at
 
     @classmethod
-    def _query_by_uuid(cls, uuid, session):
+    def _query_by_uuid(cls, uuid, project_id, session):
         query = session.query(cls)
-        return query.filter_by(id=uuid)
+        return query.filter_by(id=uuid, project_id=project_id)
 
     @classmethod
     def from_dict(cls, json_dict):
@@ -59,17 +59,17 @@ class ModelBase(object):
         with session.begin():
             session.add(self)
 
-    def delete(self, session):
+    def delete(self, project_id, session):
         result = False
         with session.begin():
-            query = self._query_by_uuid(self.id, session)
+            query = self._query_by_uuid(self.id, project_id, session)
             result = query.delete() == 1
         return result
 
     @classmethod
-    def get(cls, uuid, session):
+    def get(cls, uuid, project_id, session):
         model = None
         with session.begin():
-            query = cls._query_by_uuid(uuid, session)
+            query = cls._query_by_uuid(uuid, project_id, session)
             model = query.first()
         return model

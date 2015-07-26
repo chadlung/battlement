@@ -3,7 +3,7 @@ from tests.base import AppTestCase
 
 class TestProvisionerResource(AppTestCase):
     def test_get_provisioners(self):
-        resp = self.app.get('/v1/provisioners')
+        resp = self.get('/v1/provisioners')
 
         self.assertEqual(resp.status_int, 200)
 

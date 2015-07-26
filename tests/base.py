@@ -5,6 +5,12 @@ from battlement import db, app, config
 from battlement.db import models
 
 
+def get_headers(extra_headers=None):
+    default_headers = {'X-Project-Id': 'test_user'}
+    default_headers.update(extra_headers or {})
+    return default_headers
+
+
 class DBTestCase(unittest.TestCase):
     def setUp(self):
         super(DBTestCase, self).setUp()
@@ -21,6 +27,19 @@ class AppTestCase(DBTestCase):
         super(AppTestCase, self).setUp()
         real_app = app.BattlementApp(self._db_manager)
         self.app = webtest.TestApp(real_app)
+
+    def get(self, url, extra_headers=None):
+        return self.app.get(url, headers=get_headers(extra_headers))
+
+    def post(self, url, data=None, extra_headers=None):
+        return self.app.post_json(
+            url,
+            data,
+            headers=get_headers(extra_headers)
+        )
+
+    def delete(self, url, extra_headers=None):
+        return self.app.delete(url, headers=get_headers(extra_headers))
 
     def app_ref(self, full_ref):
         base_ref = config.cfg.get('api', 'base_ref')

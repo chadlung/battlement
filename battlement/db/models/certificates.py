@@ -8,9 +8,16 @@ class CertificateModel(models.ModelBase, models.SAModel):
     provisioner = sa.Column(sa.String(255), nullable=False)
     provision_type = sa.Column(sa.String(255), nullable=False)
     provision_data = sa.Column(models.JsonBlob(), nullable=False)
+    project_id = sa.Column(
+        sa.String(36),
+        sa.ForeignKey('projects.id'),
+        index=True,
+        nullable=False
+    )
 
-    def __init__(self, id=None, created_at=None, updated_at=None,
-                 provisioner=None, provision_type=None, provision_data=None):
+    def __init__(self, id=None, external_id=None, created_at=None,
+                 updated_at=None, provisioner=None, provision_type=None,
+                 provision_data=None):
         super(CertificateModel, self).__init__(id, created_at, updated_at)
         self.provisioner = provisioner
         self.provision_type = provision_type
