@@ -8,14 +8,17 @@ from battlement.resources.certificates import CertificatesResource
 
 
 class BattlementApp(falcon.API):
-    def __init__(self):
+    def __init__(self, db_manager=None):
         super(BattlementApp, self).__init__()
-        db.manager.setup()
+
+        if not db_manager:
+            db_manager = db.DBManager()
+            db_manager.setup()
 
         version = VersionResource()
         provisioners = ProvisionersResource()
-        certificate = CertificateResource()
-        certificates = CertificatesResource()
+        certificate = CertificateResource(db_manager)
+        certificates = CertificatesResource(db_manager)
 
         self.add_route('/', version)
         self.add_route('/v1/provisioners', provisioners)

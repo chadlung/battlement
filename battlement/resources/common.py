@@ -6,6 +6,9 @@ from battlement.config import cfg
 
 
 class APIResource(object):
+    def __init__(self, db_manager=None):
+        self.db = db_manager
+
     def format_response_body(self, body_dict):
         return json.dumps(body_dict)
 

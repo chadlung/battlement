@@ -27,6 +27,3 @@ class DBManager(object):
         parsed_url = urlparse.urlparse(self.connection)
         if parsed_url.scheme == 'sqlite':
             models.SAModel.metadata.create_all(self.engine)
-
-
-manager = DBManager()
