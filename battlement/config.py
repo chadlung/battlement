@@ -1,5 +1,5 @@
-from ConfigParser import ConfigParser
 from os import path
+from six.moves import configparser
 
 dev_dir = path.join(path.abspath(path.curdir), 'etc', 'battlement')
 
@@ -10,7 +10,7 @@ def load_config():
     if path.exists(local_config):
         config_path = local_config
 
-    config = ConfigParser()
+    config = configparser.ConfigParser()
     config.read(config_path)
     return config
 

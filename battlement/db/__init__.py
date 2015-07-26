@@ -1,7 +1,7 @@
-import urlparse
 import sqlalchemy
 from sqlalchemy import orm
 from sqlalchemy.orm import scoping
+from six.moves import urllib_parse
 
 from battlement.config import cfg
 from battlement.db import models
@@ -24,6 +24,6 @@ class DBManager(object):
         return self.DBSession()
 
     def setup(self):
-        parsed_url = urlparse.urlparse(self.connection)
+        parsed_url = urllib_parse.urlparse(self.connection)
         if parsed_url.scheme == 'sqlite':
             models.SAModel.metadata.create_all(self.engine)

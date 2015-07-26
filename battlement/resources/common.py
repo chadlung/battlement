@@ -30,7 +30,7 @@ class APIResource(object):
             self.abort(falcon.HTTP_500, 'Read Error')
 
         try:
-            obj = json.loads(raw_json)
+            obj = json.loads(raw_json.decode('utf-8'))
         except ValueError:
             self.abort(falcon.HTTP_400, 'Malformed JSON')
 
