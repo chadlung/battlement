@@ -4,3 +4,4 @@ pike
 sqlalchemy
 six
 oslo.config
+oslo.messaging

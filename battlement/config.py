@@ -1,5 +1,6 @@
 from os import path
 from oslo_config import cfg as oslo
+from oslo_messaging import opts as msg_opts
 
 dev_dir = path.join(path.abspath(path.curdir), 'etc', 'battlement')
 
@@ -15,11 +16,24 @@ def register_options(config):
         oslo.StrOpt('connection', default='sqlite://')
     ]
 
+    queue_group = oslo.OptGroup(name='queue')
+    queue_options = [
+        oslo.StrOpt('namespace', default='battlement'),
+        oslo.StrOpt('topic', default='battlement.workers'),
+        oslo.StrOpt('version', default='1.1'),
+        oslo.StrOpt('server_name', default='battlement.queue')
+    ]
+
+    rabbit_group = oslo.OptGroup(name='oslo_messaging_rabbit')
+
     config.register_group(api_group)
     config.register_group(db_group)
+    config.register_group(rabbit_group)
 
     config.register_opts(api_options, group=api_group)
     config.register_opts(db_options, group=db_group)
+    config.register_opts(queue_options, group=queue_group)
+    config.register_opts(msg_opts.impl_rabbit.rabbit_opts, group=rabbit_group)
     return config
 
 
