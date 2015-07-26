@@ -8,7 +8,7 @@ from battlement.db import models
 
 class DBManager(object):
     def __init__(self, connection=None):
-        self.connection = connection or cfg.get('db', 'connection')
+        self.connection = connection or cfg.db.connection
 
         self.engine = sqlalchemy.create_engine(self.connection)
         self.DBSession = scoping.scoped_session(

@@ -48,6 +48,6 @@ def load_and_validate(schema):
 
 
 def get_full_url(tail):
-    base = cfg.get('api', 'base_ref')
+    base = cfg.api.base_ref
     sep = '/' if not tail.startswith('/') else ''
     return '{base}{sep}{tail}'.format(base=base, sep=sep, tail=tail)

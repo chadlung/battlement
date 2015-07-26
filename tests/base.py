@@ -42,5 +42,5 @@ class AppTestCase(DBTestCase):
         return self.app.delete(url, headers=get_headers(extra_headers))
 
     def app_ref(self, full_ref):
-        base_ref = config.cfg.get('api', 'base_ref')
+        base_ref = config.cfg.api.base_ref
         return full_ref.replace(base_ref, '')
