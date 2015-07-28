@@ -1,4 +1,5 @@
 from os import path
+from oslo_log import log
 from oslo_config import cfg as oslo
 from oslo_messaging import opts as msg_opts
 
@@ -34,6 +35,9 @@ def register_options(config):
     config.register_opts(db_options, group=db_group)
     config.register_opts(queue_options, group=queue_group)
     config.register_opts(msg_opts.impl_rabbit.rabbit_opts, group=rabbit_group)
+
+    log.register_options(config)
+
     return config
 
 
