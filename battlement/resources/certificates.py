@@ -1,6 +1,6 @@
 import falcon
 
-from battlement.db.models import certificates
+from battlement.db.models import certificates, task
 from battlement.resources import common
 
 
@@ -26,11 +26,15 @@ general_certificate_creation = {
 class CertificatesResource(common.APIResource):
     @common.load_and_validate(general_certificate_creation)
     def on_post(self, req, resp, json_body):
-        model = certificates.CertificateModel.from_dict(json_body)
-        model.project_id = req.context['project']
-        model.save(self.db.session)
+        with self.db.session.begin():
+            cert_model = certificates.CertificateModel.from_dict(json_body)
+            cert_model.project_id = req.context['project']
 
-        ref = common.get_full_url('/v1/certificates/{}'.format(model.id))
+            initial_task = task.TaskModel(certificate_id=cert_model.id)
+            self.db.session.add(cert_model)
+            self.db.session.add(initial_task)
+
+        ref = common.get_full_url('/v1/certificates/{}'.format(cert_model.id))
         resp.body = self.format_response_body({'certificate_ref': ref})
 
 
@@ -41,6 +45,7 @@ class CertificateResource(common.APIResource):
             req.context['project'],
             self.db.session
         )
+        model.tasks = model.load_tasks(self.db.session)
 
         if model:
             body_dict = model.to_dict()

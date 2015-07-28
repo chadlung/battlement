@@ -1,6 +1,7 @@
 import sqlalchemy as sa
 
 from battlement.db import models
+from battlement.db.models import task
 
 
 class CertificateModel(models.ModelBase, models.SAModel):
@@ -19,15 +20,26 @@ class CertificateModel(models.ModelBase, models.SAModel):
                  updated_at=None, provisioner=None, provision_type=None,
                  provision_data=None):
         super(CertificateModel, self).__init__(id, created_at, updated_at)
+        self.project_id = external_id
         self.provisioner = provisioner
         self.provision_type = provision_type
         self.provision_data = provision_data
+        self.tasks = []
 
     def to_dict(self):
         body_dict = super(CertificateModel, self).to_dict()
         body_dict.update({
             'provisioner': self.provisioner,
             'provision_type': self.provision_type,
-            'provision_data': self.provision_data
+            'provision_data': self.provision_data,
+            'tasks': [t.to_dict() for t in self.tasks]
         })
         return body_dict
+
+    def load_tasks(self, session):
+        tasks = []
+        with session.begin():
+            query = session.query(task.TaskModel)
+            query = query.filter_by(certificate_id=self.id)
+            tasks = query.all()
+        return tasks
