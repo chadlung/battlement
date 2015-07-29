@@ -53,7 +53,7 @@ class TaskModel(models.ModelBase, models.SAModel):
     def to_dict(self):
         body_dict = super(TaskModel, self).to_dict()
         body_dict.update({
-            'type': self.task_type,
+            'type': TaskType(self.task_type).name,
         })
 
         if self.errors:
