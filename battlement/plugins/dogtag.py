@@ -9,6 +9,7 @@ LOG = log.getLogger(__name__)
 class DogtagProvisioner(ProvisionerPluginBase):
 
     def __init__(self, db_manager):
+        super(DogtagProvisioner, self).__init__(db_manager)
         self._task_handler = DogtagTaskHandler(db_manager)
 
     def name(self):

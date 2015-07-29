@@ -5,6 +5,9 @@ from pike.discovery import py
 class ProvisionerPluginBase(object):
     __metaclass__ = abc.ABCMeta
 
+    def __init__(self, db_manager):
+        self.db = db_manager
+
     @abc.abstractmethod
     def name(self):
         pass
