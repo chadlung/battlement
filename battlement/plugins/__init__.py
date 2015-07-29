@@ -8,7 +8,7 @@ class ProvisionerPluginBase(object):
     def __init__(self, db_manager):
         self.db = db_manager
 
-    @abc.abstractmethod
+    @abc.abstractproperty
     def name(self):
         pass
 
@@ -34,9 +34,9 @@ class PluginManager(object):
 
     @property
     def active_plugin_names(self):
-        return [plugin.name() for plugin in self.active_plugins]
+        return [plugin.name for plugin in self.active_plugins]
 
     def get_plugin_by_name(self, name):
         for plugin in self.active_plugins:
-            if plugin.name() == name:
+            if plugin.name == name:
                 return plugin

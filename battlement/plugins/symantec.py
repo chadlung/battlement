@@ -13,6 +13,7 @@ class SymantecProvisioner(ProvisionerPluginBase):
         super(SymantecProvisioner, self).__init__(db_manager)
         self._task_handler = SymantecTaskHandler(db_manager)
 
+    @property
     def name(self):
         return 'symantec'
 

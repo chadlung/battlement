@@ -12,6 +12,7 @@ class DogtagProvisioner(ProvisionerPluginBase):
         super(DogtagProvisioner, self).__init__(db_manager)
         self._task_handler = DogtagTaskHandler(db_manager)
 
+    @property
     def name(self):
         return 'dogtag'
 
