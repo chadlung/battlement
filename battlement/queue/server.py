@@ -63,10 +63,26 @@ class QueuingServer(service.Service):
         for work_task in tasks:
             with self.db.session.begin():
                 work_task.active = True
-                task_id, cert_id = work_task.id, work_task.certificate_id
+                task_id = work_task.id
+                cert_id = work_task.certificate_id
+                task_type = work_task.task_type
 
-                LOG.info('Queuing task: {id}'.format(id=task_id))
-                self.client.check(cert_id, task_id)
+                if task_type == task.TaskType.check:
+                    self.client.check(cert_id, task_id)
+
+                elif task_type == task.TaskType.issue:
+                    self.client.issue(cert_id, task_id)
+
+                elif task_type == task.TaskType.update:
+                    self.client.update(cert_id, task_id)
+
+                elif task_type == task.TaskType.revoke:
+                    self.client.revoke(cert_id, task_id)
+
+                elif task_type == task.TaskType.cancel:
+                    self.client.cancel(cert_id, task_id)
+
+                LOG.info('Queued task: {id}'.format(id=task_id))
 
         return self.recheck_interval
 
