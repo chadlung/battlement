@@ -8,5 +8,6 @@ class TestProvisionerResource(AppTestCase):
         self.assertEqual(resp.status_int, 200)
 
         provisioners = resp.json.get('provisioners')
-        self.assertEqual(len(provisioners), 1)
+        self.assertEqual(len(provisioners), 2)
         self.assertIn('symantec', provisioners)
+        self.assertIn('dogtag', provisioners)
