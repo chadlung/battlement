@@ -31,6 +31,7 @@ class CertificatesResource(common.APIResource):
             cert_model.project_id = req.context['project']
 
             initial_task = task.TaskModel(certificate_id=cert_model.id)
+            initial_task.task_type = task.TaskType.issue
             self.db.session.add(cert_model)
             self.db.session.add(initial_task)
 
