@@ -2,7 +2,7 @@ import falcon
 
 from oslo_log import log
 
-from battlement import db, config
+from battlement import db, config, plugins
 from battlement.middleware import auth
 from battlement.resources.version import VersionResource
 from battlement.resources.provisioner import ProvisionersResource
@@ -21,8 +21,10 @@ class BattlementApp(falcon.API):
             middleware=[auth.NoAuthMiddleware(db_manager)]
         )
 
+        plugin_mgr = plugins.PluginManager(db_manager)
+
         version = VersionResource()
-        provisioners = ProvisionersResource()
+        provisioners = ProvisionersResource(plugin_mgr)
         certificate = CertificateResource(db_manager)
         certificates = CertificatesResource(db_manager)
 
