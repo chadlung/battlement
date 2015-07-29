@@ -59,7 +59,7 @@ class TaskModel(models.ModelBase, models.SAModel):
         if self.errors:
             body_dict['errors'] = self.errors.get('msgs', [])
         if self.result:
-            body_dict['result'] = self.results
+            body_dict['result'] = self.result
         return body_dict
 
 
@@ -67,7 +67,7 @@ def get_tasks_to_queue(session):
     tasks = []
     with session.begin():
         query = session.query(TaskModel)
-        query = query.filter_by(active=False)
+        query = query.filter_by(active=False, result=None)
         query = query.filter(TaskModel.next_recheck <= datetime.utcnow())
         tasks = query.all()
     return tasks
