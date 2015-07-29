@@ -12,6 +12,33 @@ class EchoTaskHandler(queue.MessagingBase):
         return True
 
 
+class CertificatePluginHandler(queue.MessagingBase):
+    """ Proxy handler that distributes calls to plugin handlers."""
+    def __init__(self, plugin_manager):
+        super(CertificatePluginHandler, self).__init__()
+        self.plugin_mgr = plugin_manager
+
+    def issue(self, ctx, plugin_name, certificate_uuid, task_uuid):
+        plugin = self.plugin_mgr.get_plugin_by_name(plugin_name)
+        plugin.task_handler.issue(ctx, certificate_uuid, task_uuid)
+
+    def check(self, ctx, plugin_name, certificate_uuid, task_uuid):
+        plugin = self.plugin_mgr.get_plugin_by_name(plugin_name)
+        plugin.task_handler.check(ctx, certificate_uuid, task_uuid)
+
+    def update(self, ctx, plugin_name, certificate_uuid, task_uuid):
+        plugin = self.plugin_mgr.get_plugin_by_name(plugin_name)
+        plugin.task_handler.update(ctx, certificate_uuid, task_uuid)
+
+    def revoke(self, ctx, plugin_name, certificate_uuid, task_uuid):
+        plugin = self.plugin_mgr.get_plugin_by_name(plugin_name)
+        plugin.task_handler.revoke(ctx, certificate_uuid, task_uuid)
+
+    def cancel(self, ctx, plugin_name, certificate_uuid, task_uuid):
+        plugin = self.plugin_mgr.get_plugin_by_name(plugin_name)
+        plugin.task_handler.cancel(ctx, certificate_uuid, task_uuid)
+
+
 class CertificateTaskHandler(queue.MessagingBase):
     __metaclass__ = abc.ABCMeta
 

@@ -19,6 +19,7 @@ class TaskModel(models.ModelBase, models.SAModel):
     active = sa.Column(sa.Boolean, default=False)
     result = sa.Column(sa.String(255), nullable=True)
     errors = sa.Column(models.JsonBlob(), nullable=True)
+    provisioner = sa.Column(sa.String(255), nullable=False)
     next_recheck = sa.Column(sa.DateTime, default=utils.recheck_time)
     task_type = sa.Column(
         sa.SmallInteger,
@@ -37,13 +38,14 @@ class TaskModel(models.ModelBase, models.SAModel):
     )
 
     def __init__(self, id=None, certificate_id=None, active=False, result=None,
-                 errors=None, next_recheck=None, task_type=None,
-                 task_desc=None):
+                 errors=None, provisioner=None, next_recheck=None,
+                 task_type=None, task_desc=None):
         super(TaskModel, self).__init__(id=id)
         self.certificate_id = certificate_id
         self.active = active
         self.result = result
         self.errors = errors
+        self.provisioner = provisioner
         self.next_recheck = next_recheck
         self.task_type = task_type
         self.task_desc = task_desc

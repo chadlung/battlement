@@ -10,25 +10,51 @@ class MessagingClient(queue.MessagingBase):
     def echo(self, msg=None):
         return self.client.cast({}, 'echo', msg=msg)
 
-    def _cast_cert_msg(self, method, certificate_uuid, task_uuid):
+    def _cast_msg(self, method, plugin_name, certificate_uuid, task_uuid):
         return self.client.cast(
             {},
             method,
+            plugin_name=plugin_name,
             certificate_uuid=certificate_uuid,
             task_uuid=task_uuid
         )
 
-    def issue(self, certificate_uuid, task_uuid):
-        return self._cast_cert_msg('issue', certificate_uuid, task_uuid)
+    def issue(self, plugin_name, certificate_uuid, task_uuid):
+        return self._cast_msg(
+            'issue',
+            plugin_name,
+            certificate_uuid,
+            task_uuid
+        )
 
-    def check(self, certificate_uuid, task_uuid):
-        return self._cast_cert_msg('check', certificate_uuid, task_uuid)
+    def check(self, plugin_name, certificate_uuid, task_uuid):
+        return self._cast_msg(
+            'check',
+            plugin_name,
+            certificate_uuid,
+            task_uuid
+        )
 
-    def update(self, certificate_uuid, task_uuid):
-        return self._cast_cert_msg('update', certificate_uuid, task_uuid)
+    def update(self, plugin_name, certificate_uuid, task_uuid):
+        return self._cast_msg(
+            'update',
+            plugin_name,
+            certificate_uuid,
+            task_uuid
+        )
 
-    def revoke(self, certificate_uuid, task_uuid):
-        return self._cast_cert_msg('revoke', certificate_uuid, task_uuid)
+    def revoke(self, plugin_name, certificate_uuid, task_uuid):
+        return self._cast_msg(
+            'revoke',
+            plugin_name,
+            certificate_uuid,
+            task_uuid
+        )
 
-    def cancel(self, certificate_uuid, task_uuid):
-        return self._cast_cert_msg('cancel', certificate_uuid, task_uuid)
+    def cancel(self, plugin_name, certificate_uuid, task_uuid):
+        return self._cast_msg(
+            'cancel',
+            plugin_name,
+            certificate_uuid,
+            task_uuid
+        )

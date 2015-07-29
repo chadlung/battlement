@@ -1,7 +1,7 @@
 
 from battlement import queue
 from battlement.db.models import task, certificates  # noqa
-from battlement.queue import client
+from battlement.queue import client, handlers
 
 from oslo_log import log
 import oslo_messaging
@@ -25,8 +25,7 @@ class MessagingServer(queue.MessagingBase):
 
     @property
     def endpoints(self):
-        plugins = self.plugin_mgr.active_plugins
-        return [plugin.task_handler for plugin in plugins]
+        return [handlers.CertificatePluginHandler(self.plugin_mgr)]
 
     def start(self):
         try:
@@ -66,21 +65,22 @@ class QueuingServer(service.Service):
                 task_id = work_task.id
                 cert_id = work_task.certificate_id
                 task_type = work_task.task_type
+                provisioner = work_task.provisioner
 
                 if task_type == task.TaskType.check:
-                    self.client.check(cert_id, task_id)
+                    self.client.check(provisioner, cert_id, task_id)
 
                 elif task_type == task.TaskType.issue:
-                    self.client.issue(cert_id, task_id)
+                    self.client.issue(provisioner, cert_id, task_id)
 
                 elif task_type == task.TaskType.update:
-                    self.client.update(cert_id, task_id)
+                    self.client.update(provisioner, cert_id, task_id)
 
                 elif task_type == task.TaskType.revoke:
-                    self.client.revoke(cert_id, task_id)
+                    self.client.revoke(provisioner, cert_id, task_id)
 
                 elif task_type == task.TaskType.cancel:
-                    self.client.cancel(cert_id, task_id)
+                    self.client.cancel(provisioner, cert_id, task_id)
 
                 LOG.info('Queued task: {id}'.format(id=task_id))
 
