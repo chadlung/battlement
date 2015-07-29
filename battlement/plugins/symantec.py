@@ -21,6 +21,9 @@ class SymantecProvisioner(ProvisionerPluginBase):
     def task_handler(self):
         return self._task_handler
 
+    def validate_json(self, json_dict):
+        pass
+
 
 class SymantecTaskHandler(handlers.CertificateTaskHandler):
     def issue(self, ctx, certificate_uuid, task_uuid):

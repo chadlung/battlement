@@ -20,6 +20,9 @@ class DogtagProvisioner(ProvisionerPluginBase):
     def task_handler(self):
         return self._task_handler
 
+    def validate_json(self, json_dict):
+        pass
+
 
 class DogtagTaskHandler(handlers.CertificateTaskHandler):
 

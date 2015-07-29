@@ -16,6 +16,10 @@ class ProvisionerPluginBase(object):
     def task_handler(self):
         pass
 
+    @abc.abstractmethod
+    def validate_json(self, json_dict):
+        pass
+
 
 class PluginManager(object):
     def __init__(self, db_manager):

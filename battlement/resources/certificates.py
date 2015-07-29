@@ -24,8 +24,23 @@ general_certificate_creation = {
 
 
 class CertificatesResource(common.APIResource):
+    def __init__(self, db_manager, plugin_manager):
+        super(CertificatesResource, self).__init__(db_manager)
+        self.plugin_manager = plugin_manager
+
+    def _validate_provisioner(self, json_body):
+        plugin_name = json_body['provisioner']
+        plugin = self.plugin_manager.get_plugin_by_name(plugin_name)
+        if not plugin:
+            msg = "'{}' is not a supported provisioner".format(plugin_name)
+            raise falcon.HTTPBadRequest('Unsupported provisioner', msg)
+
+        plugin.validate_json(json_body)
+
     @common.load_and_validate(general_certificate_creation)
     def on_post(self, req, resp, json_body):
+        self._validate_provisioner(json_body)
+
         with self.db.session.begin():
             cert_model = certificates.CertificateModel.from_dict(json_body)
             cert_model.project_id = req.context['project']

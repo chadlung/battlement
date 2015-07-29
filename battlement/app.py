@@ -26,7 +26,7 @@ class BattlementApp(falcon.API):
         version = VersionResource()
         provisioners = ProvisionersResource(plugin_mgr)
         certificate = CertificateResource(db_manager)
-        certificates = CertificatesResource(db_manager)
+        certificates = CertificatesResource(db_manager, plugin_mgr)
 
         self.add_route('/', version)
         self.add_route('/v1/provisioners', provisioners)
