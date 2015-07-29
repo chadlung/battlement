@@ -42,7 +42,10 @@ class ModelBase(object):
     @classmethod
     def _query_by_uuid(cls, uuid, project_id, session):
         query = session.query(cls)
-        return query.filter_by(id=uuid, project_id=project_id)
+        query = query.filter_by(id=uuid)
+        if project_id:
+            query = query.filter_by(project_id=project_id)
+        return query
 
     @classmethod
     def from_dict(cls, json_dict):
