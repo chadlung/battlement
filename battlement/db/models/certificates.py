@@ -1,7 +1,13 @@
+from enum import IntEnum
 import sqlalchemy as sa
 
 from battlement.db import models
 from battlement.db.models import task, project
+
+
+class CertificateStatus(IntEnum):
+    in_progress = 1
+    complete = 2
 
 
 class CertificateModel(models.ModelBase, models.SAModel):
@@ -9,6 +15,11 @@ class CertificateModel(models.ModelBase, models.SAModel):
     provisioner = sa.Column(sa.String(255), nullable=False)
     provision_type = sa.Column(sa.String(255), nullable=False)
     provision_data = sa.Column(models.JsonBlob(), nullable=False)
+    status = sa.Column(
+        sa.SmallInteger(),
+        default=CertificateStatus.in_progress,
+        nullable=False
+    )
     project_id = sa.Column(
         sa.String(36),
         sa.ForeignKey(project.ProjectModel.id),
@@ -32,7 +43,8 @@ class CertificateModel(models.ModelBase, models.SAModel):
             'provisioner': self.provisioner,
             'provision_type': self.provision_type,
             'provision_data': self.provision_data,
-            'tasks': [t.to_dict() for t in self.tasks]
+            'tasks': [t.to_dict() for t in self.tasks],
+            'status': CertificateStatus(self.status).name,
         })
         return body_dict
 
