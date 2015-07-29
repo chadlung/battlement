@@ -1,6 +1,6 @@
 from oslo_log import log
 
-from battlement.db.models import task
+from battlement.db.models import task, certificates
 from battlement.queue import handlers
 from battlement.plugins import ProvisionerPluginBase
 
@@ -22,35 +22,26 @@ class SymantecProvisioner(ProvisionerPluginBase):
 
 
 class SymantecTaskHandler(handlers.CertificateTaskHandler):
-
     def issue(self, ctx, certificate_uuid, task_uuid):
         current_task = task.TaskModel.get(task_uuid, None, self.db.session)
 
         # TODO(jmvrbanac): Implement cert issue to Symantec
 
-        with self.db.session.begin():
-            new_task = task.TaskModel(
-                provisioner=current_task.provisioner,
-                task_type=task.TaskType.check,
-                task_desc='Waiting on CA',
-                certificate_id=certificate_uuid
-            )
-
-            self.db.session.add(new_task)
-            current_task.result = 'success'
-
+        self._to_check_workflow(current_task, 'Waiting on CA')
         LOG.info('Issued cert with Symantec - WIP')
 
     def check(self, ctx, certificate_uuid, task_uuid):
         current_task = task.TaskModel.get(task_uuid, None, self.db.session)
-        # cert = certificates.CertificateModel.get(
-        #     certificate_uuid,
-        #     project_id=None,
-        #     session=self.db.session
-        # )
+        cert = certificates.CertificateModel.get(
+            certificate_uuid,
+            project_id=None,
+            session=self.db.session
+        )
 
-        with self.db.session.begin():
-            current_task.result = 'success'
+        # TODO(jmvrbanac): Implement cert check to Symantec
+
+        # Assuming it was found
+        self._to_completed_workflow(current_task, cert)
 
         LOG.info('Checked cert with Symantec - WIP')
 

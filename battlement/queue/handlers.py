@@ -2,6 +2,7 @@ import abc
 
 from oslo_log import log
 from battlement import queue
+from battlement.db.models import task, certificates
 
 LOG = log.getLogger(__name__)
 
@@ -45,6 +46,23 @@ class CertificateTaskHandler(queue.MessagingBase):
     def __init__(self, db_manager):
         super(CertificateTaskHandler, self).__init__()
         self.db = db_manager
+
+    def _to_check_workflow(self, current_task, msg):
+        with self.db.session.begin():
+            new_task = task.TaskModel(
+                provisioner=current_task.provisioner,
+                task_type=task.TaskType.check,
+                task_desc=msg or 'Waiting on Changes',
+                certificate_id=current_task.certificate_id
+            )
+
+            self.db.session.add(new_task)
+            current_task.result = 'success'
+
+    def _to_completed_workflow(self, current_task, certificate):
+        with self.db.session.begin():
+            current_task.result = 'success'
+            certificate.status = certificates.CertificateStatus.complete
 
     @abc.abstractmethod
     def issue(self, ctx, certificate_uuid, task_uuid):
