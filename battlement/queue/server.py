@@ -1,7 +1,7 @@
 
 from battlement import queue
 from battlement.db.models import task, certificates  # noqa
-from battlement.queue import client
+from battlement.queue import client, handlers
 
 from oslo_log import log
 import oslo_messaging
@@ -23,7 +23,7 @@ class MessagingServer(queue.MessagingBase):
 
     @property
     def endpoints(self):
-        return [EchoTaskHandler()]
+        return [handlers.EchoTaskHandler()]
 
     def start(self):
         try:
@@ -78,9 +78,3 @@ class QueuingServer(service.Service):
     def stop(self):
         super(QueuingServer, self).stop()
         LOG.info('Stopped Queue Manager')
-
-
-class EchoTaskHandler(queue.MessagingBase):
-    def echo(self, ctx, *args, **kwargs):
-        LOG.info('echo: {}'.format(kwargs))
-        return True
