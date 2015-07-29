@@ -53,5 +53,6 @@ class CertificateModel(models.ModelBase, models.SAModel):
         with session.begin():
             query = session.query(task.TaskModel)
             query = query.filter_by(certificate_id=self.id)
+            query = query.order_by(sa.desc(task.TaskModel.created_at))
             tasks = query.all()
         return tasks
