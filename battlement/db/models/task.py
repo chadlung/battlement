@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import sqlalchemy as sa
 from battlement import utils
 from battlement.db import models
@@ -42,3 +44,13 @@ class TaskModel(models.ModelBase, models.SAModel):
         if self.result:
             body_dict['result'] = self.results
         return body_dict
+
+
+def get_tasks_to_queue(session):
+    tasks = []
+    with session.begin():
+        query = session.query(TaskModel)
+        query = query.filter_by(active=False)
+        query = query.filter(TaskModel.next_recheck <= datetime.utcnow())
+        tasks = query.all()
+    return tasks
