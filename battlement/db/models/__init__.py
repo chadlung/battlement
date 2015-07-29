@@ -27,17 +27,17 @@ class JsonBlob(sa_types.TypeDecorator):
 
 class ModelBase(object):
     id = sa.Column(sa.String(36), primary_key=True, default=utils.new_uuid)
-    created_at = sa.Column(sa.DateTime, default=datetime.utcnow)
-    updated_at = sa.Column(
+    created = sa.Column(sa.DateTime, default=datetime.utcnow)
+    updated = sa.Column(
         sa.DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow
     )
 
-    def __init__(self, id=None, created_at=None, updated_at=None):
+    def __init__(self, id=None, created=None, updated=None):
         self.id = id or utils.new_uuid()
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created = created
+        self.updated = updated
 
     @classmethod
     def _query_by_uuid(cls, uuid, project_id, session):
@@ -54,8 +54,8 @@ class ModelBase(object):
     def to_dict(self):
         return {
             'id': self.id,
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat()
+            'created': self.created.isoformat(),
+            'updated': self.updated.isoformat()
         }
 
     def save(self, session):

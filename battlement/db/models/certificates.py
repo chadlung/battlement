@@ -27,10 +27,9 @@ class CertificateModel(models.ModelBase, models.SAModel):
         nullable=False
     )
 
-    def __init__(self, id=None, external_id=None, created_at=None,
-                 updated_at=None, provisioner=None, provision_type=None,
-                 provision_data=None):
-        super(CertificateModel, self).__init__(id, created_at, updated_at)
+    def __init__(self, id=None, external_id=None, created=None, updated=None,
+                 provisioner=None, provision_type=None, provision_data=None):
+        super(CertificateModel, self).__init__(id, created, updated)
         self.project_id = external_id
         self.provisioner = provisioner
         self.provision_type = provision_type
@@ -53,6 +52,6 @@ class CertificateModel(models.ModelBase, models.SAModel):
         with session.begin():
             query = session.query(task.TaskModel)
             query = query.filter_by(certificate_id=self.id)
-            query = query.order_by(sa.desc(task.TaskModel.created_at))
+            query = query.order_by(sa.desc(task.TaskModel.created))
             tasks = query.all()
         return tasks

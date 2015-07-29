@@ -49,13 +49,15 @@ class CertificateResource(common.APIResource):
             req.context['project'],
             self.db.session
         )
+
+        if not model:
+            resp.status = falcon.HTTP_404
+            return
+
         model.tasks = model.load_tasks(self.db.session)
 
-        if model:
-            body_dict = model.to_dict()
-            resp.body = self.format_response_body(body_dict)
-        else:
-            resp.status = falcon.HTTP_404
+        body_dict = model.to_dict()
+        resp.body = self.format_response_body(body_dict)
 
     def on_delete(self, req, resp, uuid):
         project_id = req.context['project']
