@@ -1,7 +1,7 @@
 import sqlalchemy as sa
 
 from battlement.db import models
-from battlement.db.models import task
+from battlement.db.models import task, project
 
 
 class CertificateModel(models.ModelBase, models.SAModel):
@@ -11,7 +11,7 @@ class CertificateModel(models.ModelBase, models.SAModel):
     provision_data = sa.Column(models.JsonBlob(), nullable=False)
     project_id = sa.Column(
         sa.String(36),
-        sa.ForeignKey('projects.id'),
+        sa.ForeignKey(project.ProjectModel.id),
         index=True,
         nullable=False
     )
