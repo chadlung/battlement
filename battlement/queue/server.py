@@ -1,7 +1,7 @@
 
 from battlement import queue
 from battlement.db.models import task, certificates  # noqa
-from battlement.queue import client, handlers
+from battlement.queue import client
 
 from oslo_log import log
 import oslo_messaging
@@ -11,8 +11,10 @@ LOG = log.getLogger(__name__)
 
 
 class MessagingServer(queue.MessagingBase):
-    def __init__(self, exchange=None):
-        super(MessagingServer, self).__init__(True, exchange)
+    def __init__(self, db_manager, plugin_manager):
+        super(MessagingServer, self).__init__(True)
+        self.db = db_manager
+        self.plugin_mgr = plugin_manager
 
         self.server = oslo_messaging.get_rpc_server(
             self.transport,
@@ -23,7 +25,8 @@ class MessagingServer(queue.MessagingBase):
 
     @property
     def endpoints(self):
-        return [handlers.EchoTaskHandler()]
+        plugins = self.plugin_mgr.active_plugins
+        return [plugin.task_handler for plugin in plugins]
 
     def start(self):
         try:
@@ -60,10 +63,10 @@ class QueuingServer(service.Service):
         for work_task in tasks:
             with self.db.session.begin():
                 work_task.active = True
-                task_id = work_task.id
+                task_id, cert_id = work_task.id, work_task.certificate_id
 
                 LOG.info('Queuing task: {id}'.format(id=task_id))
-                self.client.echo('I got task {}'.format(task_id))
+                self.client.check(cert_id, task_id)
 
         return self.recheck_interval
 

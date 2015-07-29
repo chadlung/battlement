@@ -16,6 +16,7 @@ class CertificateTaskHandler(queue.MessagingBase):
     __metaclass__ = abc.ABCMeta
 
     def __init__(self, db_manager):
+        super(CertificateTaskHandler, self).__init__()
         self.db = db_manager
 
     @abc.abstractmethod

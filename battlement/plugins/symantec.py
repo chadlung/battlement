@@ -1,5 +1,9 @@
+from oslo_log import log
+
 from battlement.queue import handlers
 from battlement.plugins import ProvisionerPluginBase
+
+LOG = log.getLogger(__name__)
 
 
 class SymantecProvisioner(ProvisionerPluginBase):
@@ -18,10 +22,10 @@ class SymantecProvisioner(ProvisionerPluginBase):
 class SymantecTaskHandler(handlers.CertificateTaskHandler):
 
     def issue(self, ctx, certificate_uuid, task_uuid):
-        raise NotImplementedError
+        LOG.info('Issuing cert with symantec')
 
     def check(self, ctx, certificate_uuid, task_uuid):
-        raise NotImplementedError
+        LOG.info('Checking cert with symantec')
 
     def update(self, ctx, certificate_uuid, task_uuid):
         raise NotImplementedError
