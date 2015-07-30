@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from datetime import datetime
 
 import sqlalchemy as sa
@@ -55,7 +56,7 @@ class ModelBase(object):
         return {
             'id': self.id,
             'created': self.created.isoformat(),
-            'updated': self.updated.isoformat()
+            'updated': self.updated.isoformat(),
         }
 
     def save(self, session):
