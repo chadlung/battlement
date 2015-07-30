@@ -47,6 +47,14 @@ class CertificateModel(models.ModelBase, models.SAModel):
         })
         return body_dict
 
+    def to_minimal_dict(self):
+        body_dict = super(CertificateModel, self).to_dict()
+        body_dict.update({
+            'provisioner': self.provisioner,
+            'status': CertificateStatus(self.status).name,
+        })
+        return body_dict
+
     def load_tasks(self, session):
         tasks = []
         with session.begin():

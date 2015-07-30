@@ -56,6 +56,45 @@ class CertificatesResource(common.APIResource):
         ref = common.get_full_url('/v1/certificates/{}'.format(cert_model.id))
         resp.body = self.format_response_body({'certificate_ref': ref})
 
+    def on_get(self, req, resp):
+        project = req.context['project']
+        offset = int(req.params.get('offset', 0))
+        limit = int(req.params.get('limit', 10))
+        total_visible = offset + limit
+
+        models = certificates.CertificateModel.get_page(
+            project,
+            offset,
+            limit,
+            self.db.session
+        )
+
+        certs = [model.to_minimal_dict() for model in models]
+        total_certs = certificates.CertificateModel.project_total(
+            project,
+            self.db.session
+        )
+
+        body_dict = {
+            'certificates': certs,
+            'total': total_certs
+        }
+
+        path_template = '/v1/certificates?offset={offset}&limit={limit}'
+        if total_certs > total_visible:
+            path = path_template.format(offset=offset + limit, limit=limit)
+            body_dict['next'] = common.get_full_url(path)
+
+        if offset > 0:
+            next_offset = offset - limit
+            if next_offset < 0:
+                next_offset = 0
+
+            path = path_template.format(offset=next_offset, limit=limit)
+            body_dict['prev'] = common.get_full_url(path)
+
+        resp.body = self.format_response_body(body_dict)
+
 
 class CertificateResource(common.APIResource):
     def on_get(self, req, resp, uuid):

@@ -24,5 +24,6 @@ class NoAuthMiddleware(object):
             model.save(self.db.session)
 
         req.context.update({
-            'project': model.id
+            'project': model.id,
+            'external_id': project_id
         })

@@ -76,3 +76,23 @@ class ModelBase(object):
             query = cls._query_by_uuid(uuid, project_id, session)
             model = query.first()
         return model
+
+    @classmethod
+    def get_page(cls, project_id, offset, limit, session):
+        models = []
+        with session.begin():
+            query = session.query(cls)
+            query = query.filter_by(project_id=project_id)
+            query = query.offset(offset)
+            query = query.limit(limit)
+            models = query.all()
+        return models
+
+    @classmethod
+    def project_total(cls, project_id, session):
+        total = 0
+        with session.begin():
+            query = session.query(cls.id)
+            query = query.filter_by(project_id=project_id)
+            total = query.count()
+        return total
