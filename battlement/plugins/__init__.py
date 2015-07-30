@@ -1,4 +1,5 @@
 import abc
+import jsonschema
 from pike.discovery import py
 
 from battlement import config
@@ -6,6 +7,7 @@ from battlement import config
 
 class ProvisionerPluginBase(object):
     __metaclass__ = abc.ABCMeta
+    schema = {}
 
     def __init__(self, db_manager, has_config=False):
         self.db = db_manager
@@ -24,9 +26,8 @@ class ProvisionerPluginBase(object):
     def task_handler(self):
         pass
 
-    @abc.abstractmethod
     def validate_json(self, json_dict):
-        pass
+        jsonschema.validate(json_dict, self.schema)
 
     def config_options(self, cfg):
         return cfg

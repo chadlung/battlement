@@ -9,6 +9,12 @@ LOG = log.getLogger(__name__)
 
 
 class SymantecProvisioner(ProvisionerPluginBase):
+    schema = {
+        'type': 'object',
+        'properties': {
+            'order_id': {'type': 'string'}
+        }
+    }
 
     def __init__(self, db_manager):
         super(SymantecProvisioner, self).__init__(db_manager, True)
@@ -43,11 +49,16 @@ class SymantecProvisioner(ProvisionerPluginBase):
     def task_handler(self):
         return self._task_handler
 
-    def validate_json(self, json_dict):
-        pass
-
 
 class SymantecTaskHandler(handlers.CertificateTaskHandler):
+    def __init__(self, db_manager, cfg=None):
+        super(SymantecTaskHandler, self).__init__(db_manager, cfg)
+        self.credentials = {
+            'username': cfg.auth.username,
+            'password': cfg.auth.password,
+            'partner_code': cfg.auth.partner_code
+        }
+
     def issue(self, ctx, certificate_uuid, task_uuid):
         current_task = task.TaskModel.get(task_uuid, None, self.db.session)
 

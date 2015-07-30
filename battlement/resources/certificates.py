@@ -1,4 +1,5 @@
 import falcon
+from jsonschema.exceptions import ValidationError
 
 from battlement.db.models import certificates, task
 from battlement.resources import common
@@ -35,7 +36,11 @@ class CertificatesResource(common.APIResource):
             msg = "'{}' is not a supported provisioner".format(plugin_name)
             raise falcon.HTTPBadRequest('Unsupported provisioner', msg)
 
-        plugin.validate_json(json_body)
+        custom_plugin_dict = json_body.get(plugin_name, {})
+        try:
+            plugin.validate_json(custom_plugin_dict)
+        except ValidationError as e:
+            raise falcon.HTTPBadRequest('Validation Error', e.message)
 
     @common.load_and_validate(general_certificate_creation)
     def on_post(self, req, resp, json_body):
