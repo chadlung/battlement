@@ -43,9 +43,10 @@ class CertificatePluginHandler(queue.MessagingBase):
 class CertificateTaskHandler(queue.MessagingBase):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, db_manager):
+    def __init__(self, db_manager, cfg=None):
         super(CertificateTaskHandler, self).__init__()
         self.db = db_manager
+        self.cfg = cfg
 
     def _to_check_workflow(self, current_task, msg):
         with self.db.session.begin():

@@ -41,15 +41,27 @@ def register_options(config):
     return config
 
 
-def load_config():
-    local_config = path.join(dev_dir, 'battlement.conf')
+def get_config_path(filename):
+    local_config = path.join(dev_dir, filename)
     config_path = ''
     if path.exists(local_config):
         config_path = local_config
+    return config_path
 
-    config = register_options(oslo.ConfigOpts())
+
+def load_config(config_path, register_func):
+    config = register_func(oslo.ConfigOpts())
+
     # Using tuple for generic config
     config((), default_config_files=[config_path])
     return config
 
-cfg = load_config()
+
+def load_plugin_config(plugin_name, register_func):
+    config_name = '{}.conf'.format(plugin_name)
+    config_path = get_config_path(path.join('plugins', config_name))
+    return load_config(config_path, register_func)
+
+
+config_path = get_config_path('battlement.conf')
+cfg = load_config(config_path, register_options)

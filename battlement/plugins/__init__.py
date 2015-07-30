@@ -1,12 +1,20 @@
 import abc
 from pike.discovery import py
 
+from battlement import config
+
 
 class ProvisionerPluginBase(object):
     __metaclass__ = abc.ABCMeta
 
-    def __init__(self, db_manager):
+    def __init__(self, db_manager, has_config=False):
         self.db = db_manager
+
+        if has_config:
+            self.cfg = config.load_plugin_config(
+                self.name,
+                self.config_options
+            )
 
     @abc.abstractproperty
     def name(self):
@@ -19,6 +27,9 @@ class ProvisionerPluginBase(object):
     @abc.abstractmethod
     def validate_json(self, json_dict):
         pass
+
+    def config_options(self, cfg):
+        return cfg
 
 
 class PluginManager(object):

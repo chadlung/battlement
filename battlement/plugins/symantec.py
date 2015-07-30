@@ -1,3 +1,4 @@
+from oslo_config import cfg as oslo
 from oslo_log import log
 
 from battlement.db.models import task, certificates
@@ -10,8 +11,29 @@ LOG = log.getLogger(__name__)
 class SymantecProvisioner(ProvisionerPluginBase):
 
     def __init__(self, db_manager):
-        super(SymantecProvisioner, self).__init__(db_manager)
-        self._task_handler = SymantecTaskHandler(db_manager)
+        super(SymantecProvisioner, self).__init__(db_manager, True)
+        self._task_handler = SymantecTaskHandler(db_manager, self.cfg)
+
+    def config_options(self, cfg):
+        auth_group = oslo.OptGroup(name='auth')
+        auth_options = [
+            oslo.StrOpt('partner_code'),
+            oslo.StrOpt('username'),
+            oslo.StrOpt('password')
+        ]
+
+        general_group = oslo.OptGroup(name='general')
+        general_options = [
+            oslo.StrOpt('endpoint')
+        ]
+
+        cfg.register_group(auth_group)
+        cfg.register_group(general_group)
+
+        cfg.register_opts(auth_options, group=auth_group)
+        cfg.register_opts(general_options, group=general_group)
+
+        return cfg
 
     @property
     def name(self):
