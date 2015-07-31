@@ -7,3 +7,4 @@ six
 oslo.config
 oslo.log
 oslo.messaging
+git+git://github.com/cloudkeep/symantecssl.git

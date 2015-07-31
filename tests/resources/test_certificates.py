@@ -7,6 +7,9 @@ create_data = {
         'csr': 'boo',
         'certificate_type': 'foo',
         'approval_email_address': 'floo'
+    },
+    'symantec': {
+        'order_id': '123'
     }
 }
 

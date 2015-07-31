@@ -1,6 +1,8 @@
 from oslo_config import cfg as oslo
 from oslo_log import log
 
+from symantecssl import order, request_models
+
 from battlement.db.models import task, certificates
 from battlement.queue import handlers
 from battlement.plugins import ProvisionerPluginBase
@@ -11,6 +13,7 @@ LOG = log.getLogger(__name__)
 class SymantecProvisioner(ProvisionerPluginBase):
     schema = {
         'type': 'object',
+        'required': ['order_id'],
         'properties': {
             'order_id': {'type': 'string'}
         }
@@ -59,6 +62,19 @@ class SymantecTaskHandler(handlers.CertificateTaskHandler):
             'partner_code': cfg.auth.partner_code
         }
 
+    def _request(self, order_obj):
+        response = None
+        try:
+            response = order.post_request(
+                self.cfg.general.endpoint,
+                order_obj,
+                self.credentials
+            )
+        except order.FailedRequest as e:
+            response = e.response
+            LOG.exception(e)
+        return response
+
     def issue(self, ctx, certificate_uuid, task_uuid):
         current_task = task.TaskModel.get(task_uuid, None, self.db.session)
 
@@ -75,10 +91,31 @@ class SymantecTaskHandler(handlers.CertificateTaskHandler):
             session=self.db.session
         )
 
-        # TODO(jmvrbanac): Implement cert check to Symantec
+        order_request = request_models.GetOrderByPartnerOrderID()
+        order_request.partner_order_id = cert.plugin_data.get('order_id')
 
-        # Assuming it was found
-        self._to_completed_workflow(current_task, cert)
+        res = self._request(order_request)
+
+        complete_statuses = ['ORDER_COMPLETE', 'ORDER_CANCELED', 'DEACTIVATED']
+        if res.status_code == 200:
+            if res.model.status_code in complete_statuses:
+                server_cert = None
+                if res.model.certificates:
+                    server_cert = res.model.certificates.server_cert
+
+                self._to_completed_workflow(
+                    current_task,
+                    cert_model=cert,
+                    certificate=server_cert,
+                    intermediates=[]
+                )
+            else:
+                self._to_recheck_workflow(current_task)
+
+        # How do we determine the difference between a problem with the api
+        # and just a bad request?
+        else:
+            self._to_recheck_workflow(current_task)
 
         LOG.info('Checked cert with Symantec - WIP')
 
