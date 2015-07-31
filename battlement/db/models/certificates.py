@@ -16,6 +16,7 @@ class CertificateModel(models.ModelBase, models.SAModel):
     provision_type = sa.Column(sa.String(255), nullable=False)
     provision_data = sa.Column(models.JsonBlob(), nullable=False)
     plugin_data = sa.Column(models.JsonBlob(), nullable=True)
+    certificate = sa.Column(sa.Text(), nullable=True)
     status = sa.Column(
         sa.SmallInteger(),
         default=CertificateStatus.in_progress,
@@ -30,12 +31,13 @@ class CertificateModel(models.ModelBase, models.SAModel):
 
     def __init__(self, id=None, external_id=None, created=None, updated=None,
                  provisioner=None, provision_type=None, provision_data=None,
-                 *arg, **kwargs):
+                 certificate=None, *arg, **kwargs):
         super(CertificateModel, self).__init__(id, created, updated)
         self.project_id = external_id
         self.provisioner = provisioner
         self.provision_type = provision_type
         self.provision_data = provision_data
+        self.certificate = certificate
         self.tasks = []
         self.plugin_data = kwargs.get(provisioner)
 
@@ -47,6 +49,7 @@ class CertificateModel(models.ModelBase, models.SAModel):
             'provision_data': self.provision_data,
             'tasks': [t.to_dict() for t in self.tasks],
             'status': CertificateStatus(self.status).name,
+            'certificate': self.certificate,
             self.provisioner: self.plugin_data
         })
         return body_dict
