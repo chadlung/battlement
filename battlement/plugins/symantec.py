@@ -56,17 +56,26 @@ class SymantecProvisioner(ProvisionerPluginBase):
 class SymantecTaskHandler(handlers.CertificateTaskHandler):
     def __init__(self, db_manager, cfg=None):
         super(SymantecTaskHandler, self).__init__(db_manager, cfg)
+        self.order_endpoint = '{}/order.jws?WSDL'.format(cfg.general.endpoint)
+        self.query_endpoint = '{}/query.jws?WSDL'.format(cfg.general.endpoint)
         self.credentials = {
             'username': cfg.auth.username,
             'password': cfg.auth.password,
             'partner_code': cfg.auth.partner_code
         }
 
-    def _request(self, order_obj):
+    def _request(self, order_obj, req_type):
         response = None
+
+        # Make sure we use the correct endpoint
+        if req_type.lower() == 'order':
+            endpoint = self.order_endpoint
+        else:
+            endpoint = self.query_endpoint
+
         try:
             response = order.post_request(
-                self.cfg.general.endpoint,
+                endpoint,
                 order_obj,
                 self.credentials
             )
@@ -94,7 +103,7 @@ class SymantecTaskHandler(handlers.CertificateTaskHandler):
         order_request = request_models.GetOrderByPartnerOrderID()
         order_request.partner_order_id = cert.plugin_data.get('order_id')
 
-        res = self._request(order_request)
+        res = self._request(order_request, 'query')
 
         complete_statuses = ['ORDER_COMPLETE', 'ORDER_CANCELED', 'DEACTIVATED']
         if res.status_code == 200:
